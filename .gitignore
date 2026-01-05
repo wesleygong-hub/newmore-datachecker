@@ -1,0 +1,23 @@
+# === Delphi compiler output ===
+*.exe
+*.dll
+*.bpl
+*.dcu
+*.map
+
+# === Delphi IDE files ===
+*.identcache
+*.local
+*.stat
+*.dsk
+*.~*
+
+# === Build folders ===
+Win32/
+Win64/
+
+# === Delphi history ===
+__history/
+
+# === Logs ===
+*.log
