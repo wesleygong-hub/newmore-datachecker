@@ -21,3 +21,8 @@ __history/
 
 # === Logs ===
 *.log
+
+# === Local reconciliation data ===
+*.xls
+*.xlsx
+*.~sql
