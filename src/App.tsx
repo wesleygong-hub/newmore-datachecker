@@ -521,7 +521,10 @@ export default function App() {
         )}
       </main>
 
-      <footer>牛马对账 · 纯浏览器核对 · 无数据库 · 无服务端上传</footer>
+      <footer>
+        <span>牛马对账 · 纯浏览器核对 · 无数据库 · 无服务端上传</span>
+        <span className="version-badge" aria-label="当前版本 v2.0.0">v2.0.0</span>
+      </footer>
     </div>
   );
 }
