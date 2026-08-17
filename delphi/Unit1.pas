@@ -783,7 +783,7 @@ end;
 
 procedure TForm1.btnImportThreadClick(Sender: TObject);
 begin
-  TImportThread.Create;
+  TImportThread.Create; // 创建线程
 end;
 
 constructor TImportThread.Create;

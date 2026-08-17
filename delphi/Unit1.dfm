@@ -25,7 +25,6 @@ object Form1: TForm1
     Height = 213
     Align = alClient
     TabOrder = 0
-    ExplicitHeight = 162
     object btnExport: TButton
       Left = 17
       Top = 153
@@ -160,7 +159,6 @@ object Form1: TForm1
           Text = 'Build 20260104'
           Width = 50
         end>
-      ExplicitTop = 142
     end
     object btnRoll: TButton
       Left = 343
