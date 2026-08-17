@@ -455,7 +455,7 @@ export default function App() {
               </div>
             </div>
 
-            {!output.detailsIncluded && (
+            {!output.detailsIncluded && !exporting && (
               <div className="large-mode-note">
                 已使用大文件模式逐行汇总；导出文件不包含两套原始明细，但仍会完整保留 Excel 样式。生成大文件时耗时较长，请勿关闭页面。
               </div>
@@ -464,7 +464,9 @@ export default function App() {
             {exporting && (
               <div className="export-status" role="status" aria-live="polite">
                 <span className="export-status-spinner" />
-                正在后台生成并美化 Excel，大文件可能需要几分钟；页面仍可正常操作，请勿关闭。
+                {output.detailsIncluded
+                  ? "正在后台生成并美化 Excel，页面仍可正常操作，请勿关闭。"
+                  : "正在后台生成并美化 Excel；当前为大文件模式，导出不包含两套原始明细，但会完整保留 Excel 样式。生成可能需要几分钟，请勿关闭页面。"}
               </div>
             )}
             {exportError && <div className="export-error" role="alert">导出失败：{exportError}</div>}
