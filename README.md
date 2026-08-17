@@ -1,8 +1,8 @@
 # 牛马对账 2.0
 
-这是上海速创—聚合力账单核对工具的纯浏览器版本。账单文件在浏览器内读取、汇总和比对，不写入数据库，也不会上传到服务器。
+`newmore-datachecker` 是上海速创—聚合力账单核对工具“牛马对账”的纯浏览器版本。账单文件在浏览器内读取、汇总和比对，不写入数据库，也不会上传到服务器。
 
-当前 `main` 直接以 Web 2.0 工程为根项目。原 Delphi 1.0 桌面版统一归档在 [`delphi/`](delphi)，正式历史快照见 [`v1.0.0`](https://github.com/wesleygong-hub/NewMoreDataChecker/tree/v1.0.0)。
+当前 `main` 直接以 Web 2.0 工程为根项目。原 Delphi 1.0 桌面版统一归档在 [`delphi/`](delphi)，正式历史快照见 [`v1.0.0`](https://github.com/wesleygong-hub/newmore-datachecker/tree/v1.0.0)。
 
 ## 当前核对规则
 
