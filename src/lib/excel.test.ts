@@ -60,7 +60,7 @@ describe("Excel adapters", () => {
 });
 
 const samplePath = fileURLToPath(
-  new URL("../../../上海速创-聚合力对账/对账数据20251217.xlsx", import.meta.url),
+  new URL("../../上海速创-聚合力对账/对账数据20251217.xlsx", import.meta.url),
 );
 
 describe.skipIf(!existsSync(samplePath))("历史样例回归", () => {

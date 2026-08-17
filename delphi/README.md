@@ -9,6 +9,6 @@
 - `PUBLIC/`：原工程依赖的公共单元和窗体。
 - `上海速创-聚合力对账.sql`：原数据库核对 SQL 参考。
 
-该版本需要原有 Delphi、数据库连接及相关运行环境。无需数据库的当前版本位于仓库根目录的 [`web`](../web)。
+该版本需要原有 Delphi、数据库连接及相关运行环境。无需数据库的当前 Web 版本直接位于[仓库根目录](../)。
 
 正式历史快照请查看 Git 标签 [`v1.0.0`](https://github.com/wesleygong-hub/NewMoreDataChecker/tree/v1.0.0)。

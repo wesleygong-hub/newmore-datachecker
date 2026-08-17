@@ -26,3 +26,8 @@ __history/
 *.xls
 *.xlsx
 *.~sql
+
+# === Web dependencies and build output ===
+node_modules/
+dist/
+coverage/
