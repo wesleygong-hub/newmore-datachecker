@@ -63,6 +63,7 @@ describe("Excel 导出", () => {
       raw: true,
     });
     expect(rows[1][5]).toBe("310101199001010011");
+    expect(rows[1][7]).toBe("测试客户");
     expect(rows[1][12]).toBe(0);
   });
 

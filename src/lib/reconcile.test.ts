@@ -79,6 +79,19 @@ describe("reconcile", () => {
     expect(output.results[0].status).toBe("different");
   });
 
+  it("对账结果只保留速创客户简称，不混入客户全称", () => {
+    const output = reconcile(
+      [
+        record("sc", { companyName: "客户简称B", companyFullName: "客户全称B" }),
+        record("sc", { companyName: "客户简称A", companyFullName: "客户全称A" }),
+      ],
+      [],
+      [],
+    );
+
+    expect(output.results[0].scCompanyNames).toEqual(["客户简称A", "客户简称B"]);
+  });
+
   it("保留单边记录", () => {
     const output = reconcile(
       [record("sc", { id: "SC-ONLY" })],

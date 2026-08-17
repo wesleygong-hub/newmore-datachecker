@@ -189,10 +189,7 @@ export function reconcileAggregateMaps(
       scEmployeeNos: compactResultValues(setValues(sc?.employeeNos)),
       hrallyEmployeeNos: compactResultValues(setValues(hrally?.employeeNos)),
       scCompanyNos: compactResultValues(companyNos),
-      scCompanyNames: compactResultValues([
-        ...setValues(sc?.companyNames),
-        ...setValues(sc?.companyFullNames),
-      ]),
+      scCompanyNames: compactResultValues(setValues(sc?.companyNames)),
       hrallyCompanyNames: compactResultValues([
         ...setValues(hrally?.companyNames),
         ...setValues(hrally?.companyFullNames),
