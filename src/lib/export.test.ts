@@ -1,8 +1,9 @@
 import * as XLSX from "xlsx";
 import StyledXLSX from "xlsx-js-style";
+import { strFromU8, unzipSync } from "fflate";
 import { describe, expect, it } from "vitest";
 import type { ReconciliationOutput } from "../domain/types";
-import { buildWorkbook, FULL_BODY_STYLE_CELL_LIMIT, shouldApplyFullBodyStyle } from "./export";
+import { buildWorkbook, serializeReconciliation } from "./export";
 
 const output: ReconciliationOutput = {
   results: [
@@ -99,9 +100,23 @@ describe("Excel 导出", () => {
     });
   });
 
-  it("超大结果仅保留轻量样式，避免逐单元格边框占用过多内存", () => {
-    const rowCount = Math.floor(FULL_BODY_STYLE_CELL_LIMIT / 16) + 1;
-    expect(shouldApplyFullBodyStyle(rowCount - 1, 16)).toBe(true);
-    expect(shouldApplyFullBodyStyle(rowCount, 16)).toBe(false);
+  it("大文件结果模式仍使用样式写入器并保留完整表头和正文格式", () => {
+    const largeModeOutput = { ...output, detailsIncluded: false };
+    const data = serializeReconciliation(largeModeOutput);
+    const reopened = XLSX.read(data, { type: "array", cellStyles: true });
+    const sheet = reopened.Sheets["对账结果"];
+    const archive = unzipSync(new Uint8Array(data));
+    const sheetXml = strFromU8(archive["xl/worksheets/sheet1.xml"]);
+    const stylesXml = strFromU8(archive["xl/styles.xml"]);
+
+    expect(reopened.SheetNames).toEqual(["对账结果", "导入错误", "统计摘要", "客户映射异常"]);
+    expect(sheet.A1.s).toMatchObject({
+      patternType: "solid",
+      fgColor: { rgb: "808080" },
+    });
+    expect(sheetXml).toMatch(/<c r="A2" s="\d+"/);
+    expect(sheetXml).toMatch(/<c r="M2" s="\d+"/);
+    expect(stylesXml).toContain('<border><left style="thin">');
+    expect(stylesXml).toContain('numFmtId="2"');
   });
 });

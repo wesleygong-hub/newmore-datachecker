@@ -1,6 +1,5 @@
 import XLSX from "xlsx-js-style";
 import type { CellStyle, WorkBook, WorkSheet } from "xlsx-js-style";
-import type { WorkBook as FastWorkBook } from "xlsx";
 import type {
   ImportIssue,
   NormalizedRecord,
@@ -54,14 +53,6 @@ const INTEGER_BODY_STYLE: CellStyle = {
   numFmt: "0",
 };
 
-// 旧版结果通常是月度小表，可以完整复刻细边框；年度大表若给数百万单元格
-// 逐个附加样式，会明显增加浏览器内存和导出时间，因此不为其正文逐格附加样式。
-export const FULL_BODY_STYLE_CELL_LIMIT = 250_000;
-
-export function shouldApplyFullBodyStyle(rowCount: number, columnCount: number): boolean {
-  return rowCount * columnCount <= FULL_BODY_STYLE_CELL_LIMIT;
-}
-
 interface SheetFormatOptions {
   centeredColumns?: number[];
   integerColumns?: number[];
@@ -96,7 +87,6 @@ function makeSheet(
   const centeredColumns = new Set(options.centeredColumns ?? []);
   const integerColumns = new Set(options.integerColumns ?? []);
   const moneyColumns = new Set(options.moneyColumns ?? []);
-  const fullBodyStyle = shouldApplyFullBodyStyle(rows.length, headers.length);
 
   for (let column = 0; column < headers.length; column += 1) {
     const cell = sheet[XLSX.utils.encode_cell({ r: 0, c: column })];
@@ -110,11 +100,11 @@ function makeSheet(
 
       if (moneyColumns.has(column)) {
         cell.z = "0.00";
-        if (fullBodyStyle) cell.s = MONEY_BODY_STYLE;
+        cell.s = MONEY_BODY_STYLE;
       } else if (integerColumns.has(column)) {
         cell.z = "0";
-        if (fullBodyStyle) cell.s = INTEGER_BODY_STYLE;
-      } else if (fullBodyStyle) {
+        cell.s = INTEGER_BODY_STYLE;
+      } else {
         cell.s = centeredColumns.has(column) ? CENTERED_BODY_STYLE : BODY_STYLE;
       }
     }
@@ -299,15 +289,19 @@ export function buildWorkbook(output: ReconciliationOutput): WorkBook {
   return workbook;
 }
 
+export function serializeReconciliation(output: ReconciliationOutput): ArrayBuffer {
+  return XLSX.write(buildWorkbook(output), {
+    type: "array",
+    compression: true,
+    bookType: "xlsx",
+  }) as ArrayBuffer;
+}
+
 export async function exportReconciliation(output: ReconciliationOutput): Promise<void> {
-  const workbook = buildWorkbook(output);
   const months = [...new Set(output.results.map((result) => result.accYm))];
   const monthPart = months.length === 1 ? `_${months[0]}` : "";
   const fileName = `上海速创-聚合力对账${monthPart}_${timestamp()}.xlsx`;
-  const writeOptions = { type: "array", compression: true, bookType: "xlsx" } as const;
-  const data = output.detailsIncluded
-    ? XLSX.write(workbook, writeOptions)
-    : (await import("xlsx")).write(workbook as unknown as FastWorkBook, writeOptions);
+  const data = serializeReconciliation(output);
   const url = URL.createObjectURL(
     new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
   );

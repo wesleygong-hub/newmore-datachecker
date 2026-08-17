@@ -406,7 +406,7 @@ export default function App() {
 
             {!output.detailsIncluded && (
               <div className="large-mode-note">
-                已使用大文件模式逐行汇总；为控制内存，导出文件不包含两套原始明细，仅包含核对结果、错误和摘要。
+                已使用大文件模式逐行汇总；导出文件不包含两套原始明细，但仍会完整保留 Excel 样式。生成大文件时耗时较长，请勿关闭页面。
               </div>
             )}
 
