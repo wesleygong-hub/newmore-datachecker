@@ -168,8 +168,7 @@ function issueRows(issues: ImportIssue[]): Array<Array<string | number>> {
   ]);
 }
 
-function timestamp(): string {
-  const date = new Date();
+function timestamp(date = new Date()): string {
   const part = (value: number) => String(value).padStart(2, "0");
   return `${date.getFullYear()}${part(date.getMonth() + 1)}${part(date.getDate())}_${part(date.getHours())}${part(date.getMinutes())}${part(date.getSeconds())}`;
 }
@@ -289,6 +288,15 @@ export function buildWorkbook(output: ReconciliationOutput): WorkBook {
   return workbook;
 }
 
+export function reconciliationFileName(
+  output: ReconciliationOutput,
+  date = new Date(),
+): string {
+  const months = [...new Set(output.results.map((result) => result.accYm))];
+  const monthPart = months.length === 1 ? `_${months[0]}` : "";
+  return `上海速创-聚合力对账${monthPart}_${timestamp(date)}.xlsx`;
+}
+
 export function serializeReconciliation(output: ReconciliationOutput): ArrayBuffer {
   return XLSX.write(buildWorkbook(output), {
     type: "array",
@@ -298,9 +306,7 @@ export function serializeReconciliation(output: ReconciliationOutput): ArrayBuff
 }
 
 export async function exportReconciliation(output: ReconciliationOutput): Promise<void> {
-  const months = [...new Set(output.results.map((result) => result.accYm))];
-  const monthPart = months.length === 1 ? `_${months[0]}` : "";
-  const fileName = `上海速创-聚合力对账${monthPart}_${timestamp()}.xlsx`;
+  const fileName = reconciliationFileName(output);
   const data = serializeReconciliation(output);
   const url = URL.createObjectURL(
     new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),

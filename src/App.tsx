@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import niumaLogo from "./assets/niuma-reconcile-logo.png";
 import type {
   ImportIssue,
+  ExportWorkerRequest,
+  ExportWorkerResponse,
   ReconciliationOutput,
   ReconciliationResult,
   ReconciliationStatus,
@@ -216,6 +218,8 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
+  const exportWorkerRef = useRef<Worker | null>(null);
   const [quoteIndex, setQuoteIndex] = useState(() => randomQuoteIndex());
 
   useEffect(() => {
@@ -225,6 +229,8 @@ export default function App() {
     }, 2800);
     return () => window.clearInterval(timer);
   }, [phase]);
+
+  useEffect(() => () => exportWorkerRef.current?.terminate(), []);
 
   const filteredResults = useMemo(() => {
     if (!output || filter === "issues") return [];
@@ -303,6 +309,8 @@ export default function App() {
   }
 
   function reset() {
+    exportWorkerRef.current?.terminate();
+    exportWorkerRef.current = null;
     setPhase("idle");
     setOutput(null);
     setError("");
@@ -311,16 +319,59 @@ export default function App() {
     setSearch("");
     setPage(1);
     setExporting(false);
+    setExportError("");
   }
 
   async function handleExport() {
     if (!output || exporting) return;
     setExporting(true);
-    await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
+    setExportError("");
+
+    // Let React paint the busy state before copying a potentially large result to the worker.
+    await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
+
+    let worker: Worker | null = null;
     try {
-      const { exportReconciliation } = await import("./lib/export");
-      await exportReconciliation(output);
+      worker = new Worker(new URL("./workers/export.worker.ts", import.meta.url), {
+        type: "module",
+      });
+      exportWorkerRef.current = worker;
+
+      const result = await new Promise<Extract<ExportWorkerResponse, { type: "complete" }>>(
+        (resolve, reject) => {
+          if (!worker) {
+            reject(new Error("无法启动 Excel 导出线程。"));
+            return;
+          }
+          worker.onmessage = (event: MessageEvent<ExportWorkerResponse>) => {
+            if (event.data.type === "complete") {
+              resolve(event.data);
+              return;
+            }
+            reject(new Error(event.data.message));
+          };
+          worker.onerror = (event) => {
+            reject(new Error(event.message || "Excel 导出线程发生异常。"));
+          };
+          const request: ExportWorkerRequest = { type: "export", output };
+          worker.postMessage(request);
+        },
+      );
+
+      const url = URL.createObjectURL(new Blob(
+        [result.data],
+        { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+      ));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = result.fileName;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    } catch (caught) {
+      setExportError(caught instanceof Error ? caught.message : "Excel 生成失败，请重新尝试。");
     } finally {
+      worker?.terminate();
+      if (exportWorkerRef.current === worker) exportWorkerRef.current = null;
       setExporting(false);
     }
   }
@@ -409,6 +460,14 @@ export default function App() {
                 已使用大文件模式逐行汇总；导出文件不包含两套原始明细，但仍会完整保留 Excel 样式。生成大文件时耗时较长，请勿关闭页面。
               </div>
             )}
+
+            {exporting && (
+              <div className="export-status" role="status" aria-live="polite">
+                <span className="export-status-spinner" />
+                正在后台生成并美化 Excel，大文件可能需要几分钟；页面仍可正常操作，请勿关闭。
+              </div>
+            )}
+            {exportError && <div className="export-error" role="alert">导出失败：{exportError}</div>}
 
             <div className="summary-grid">
               {[

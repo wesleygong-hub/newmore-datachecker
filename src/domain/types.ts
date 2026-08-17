@@ -122,3 +122,12 @@ export type WorkerResponse =
   | { type: "progress"; stage: string; percent: number }
   | { type: "complete"; output: ReconciliationOutput }
   | { type: "error"; message: string };
+
+export interface ExportWorkerRequest {
+  type: "export";
+  output: ReconciliationOutput;
+}
+
+export type ExportWorkerResponse =
+  | { type: "complete"; data: ArrayBuffer; fileName: string }
+  | { type: "error"; message: string };

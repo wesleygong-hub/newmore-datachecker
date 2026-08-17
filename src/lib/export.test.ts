@@ -3,7 +3,7 @@ import StyledXLSX from "xlsx-js-style";
 import { strFromU8, unzipSync } from "fflate";
 import { describe, expect, it } from "vitest";
 import type { ReconciliationOutput } from "../domain/types";
-import { buildWorkbook, serializeReconciliation } from "./export";
+import { buildWorkbook, reconciliationFileName, serializeReconciliation } from "./export";
 
 const output: ReconciliationOutput = {
   results: [
@@ -47,6 +47,11 @@ const output: ReconciliationOutput = {
 };
 
 describe("Excel 导出", () => {
+  it("按账单年月和生成时间命名导出文件", () => {
+    expect(reconciliationFileName(output, new Date(2026, 7, 18, 9, 5, 7)))
+      .toBe("上海速创-聚合力对账_202512_20260818_090507.xlsx");
+  });
+
   it("生成完整工作簿并保持身份证号为文本", () => {
     const workbook = buildWorkbook(output);
     expect(workbook.SheetNames).toEqual([

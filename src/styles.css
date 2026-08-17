@@ -117,6 +117,10 @@ main { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 38px 0 36
 .completion-banter { display: flex; align-items: flex-start; gap: 7px; max-width: 650px; margin-top: 10px; padding: 8px 10px; border: 1px solid #e6dfc8; border-radius: 9px; color: #6a5424; background: #fffaf0; font-size: 13px; line-height: 1.55; }
 .completion-banter svg { flex: 0 0 auto; width: 16px; height: 16px; margin-top: 2px; color: var(--brand-orange); }
 .large-mode-note { margin: 14px 18px 0; padding: 11px 13px; border: 1px solid #cfe3dc; border-radius: 9px; color: #35685d; background: #eef7f4; font-size: 13px; line-height: 1.6; }
+.export-status, .export-error { display: flex; align-items: center; gap: 9px; margin: 14px 18px 0; padding: 11px 13px; border-radius: 9px; font-size: 13px; line-height: 1.6; }
+.export-status { border: 1px solid #e6dfc8; color: #6a5424; background: #fffaf0; }
+.export-error { border: 1px solid #e5b9b9; color: #a63838; background: #fff0f0; }
+.export-status-spinner { flex: 0 0 auto; width: 16px; height: 16px; border: 2px solid rgba(106, 84, 36, .22); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin .8s linear infinite; }
 .result-actions { display: flex; gap: 9px; }
 .primary-button, .secondary-button { padding: 9px 13px; border: 1px solid #d5dde1; background: #fff; }
 .primary-button { border-color: var(--brand-green-dark); color: #fff; background: linear-gradient(135deg, var(--brand-green), var(--brand-green-dark)); }
