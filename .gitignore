@@ -26,6 +26,10 @@ __history/
 *.xls
 *.xlsx
 *.~sql
+!docs/客户清单模板.xlsx
+
+# === Local generated previews and artifacts ===
+outputs/
 
 # === Web dependencies and build output ===
 node_modules/

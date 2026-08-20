@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import * as XLSX from "xlsx";
 import { describe, expect, it } from "vitest";
 import type { TransferFile } from "../domain/types";
-import { parseHrallyWorkbook, parseScWorkbook } from "./excel";
+import { parseCustomerWorkbook, parseHrallyWorkbook, parseScWorkbook } from "./excel";
 import { reconcile } from "./reconcile";
 
 function workbookFile(name: string, sheets: Record<string, unknown[][]>): TransferFile {
@@ -22,6 +22,22 @@ function bufferFile(path: string, name: string): TransferFile {
 }
 
 describe("Excel adapters", () => {
+  it("读取随项目提供的客户清单 Excel 模板", () => {
+    const templatePath = fileURLToPath(
+      new URL("../../docs/客户清单模板.xlsx", import.meta.url),
+    );
+    const parsed = parseCustomerWorkbook(bufferFile(templatePath, "客户清单模板.xlsx"));
+
+    expect(parsed.issues).toHaveLength(0);
+    expect(parsed.mappings).toEqual([
+      expect.objectContaining({
+        companyNo: "示例客户001",
+        groupName: "示例客户组",
+        partyName: "示例发包方",
+      }),
+    ]);
+  });
+
   it("按表头识别速创汇总格式", () => {
     const file = workbookFile("速创202512.xlsx", {
       关联方账单202512: [
